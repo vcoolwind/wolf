@@ -26,7 +26,7 @@ sed -e "s|http://127.0.0.1:10084|${BACKEND_URL}|" \
   > /etc/nginx/conf.d/app-${RBAC_APP_ID}.conf
 
 if [ ! -n "${UNAUTHORIZED_CONFIG}" ]; then
-  EXTENSION_CONFIG="UNAUTHORIZED_DIRECT=false"
+  UNAUTHORIZED_CONFIG="UNAUTHORIZED_DIRECT=false"
 fi
 
 sed  -e "s|#UNAUTHORIZED_CONFIG|${UNAUTHORIZED_CONFIG}|" \
