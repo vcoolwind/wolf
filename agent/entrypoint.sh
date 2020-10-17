@@ -16,18 +16,21 @@ fi
 if [ ! -n "${EXTENSION_CONFIG}" ]; then
   EXTENSION_CONFIG="#EXTENSION_CONFIG"
 fi
-if [ ! -n "${UNAUTHORIZED_CONFIG}" ]; then
-  EXTENSION_CONFIG="UNAUTHORIZED_DIRECT=false"
-fi
-
 
 sed -e "s|http://127.0.0.1:10084|${BACKEND_URL}|" \
   -e "s|http://127.0.0.1:10080|${RBAC_SERVER_URL}|" \
   -e "s/unknow/${RBAC_APP_ID}/" \
   -e "s/10082/${AGENT_PORT}/" \
   -e "s|#EXTENSION_CONFIG|${EXTENSION_CONFIG}|" \
-  -e "s|#UNAUTHORIZED_CONFIG|${UNAUTHORIZED_CONFIG}|" \
   conf/server-demo.conf \
   > /etc/nginx/conf.d/app-${RBAC_APP_ID}.conf
+
+if [ ! -n "${UNAUTHORIZED_CONFIG}" ]; then
+  EXTENSION_CONFIG="UNAUTHORIZED_DIRECT=false"
+fi
+
+sed  -e "s|#UNAUTHORIZED_CONFIG|${UNAUTHORIZED_CONFIG}|" \
+  conf/nginx.conf \
+  > /usr/local/openresty/nginx/conf/nginx.conf
 
 /usr/local/openresty/bin/openresty -g "daemon off;"
