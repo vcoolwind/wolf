@@ -13,9 +13,11 @@ fi
 if [ ! -n "${AGENT_PORT}" ]; then
   AGENT_PORT="10082"
 fi
-
 if [ ! -n "${EXTENSION_CONFIG}" ]; then
   EXTENSION_CONFIG="#EXTENSION_CONFIG"
+fi
+if [ ! -n "${UNAUTHORIZED_CONFIG}" ]; then
+  EXTENSION_CONFIG="UNAUTHORIZED_DIRECT=false"
 fi
 
 
@@ -24,6 +26,7 @@ sed -e "s|http://127.0.0.1:10084|${BACKEND_URL}|" \
   -e "s/unknow/${RBAC_APP_ID}/" \
   -e "s/10082/${AGENT_PORT}/" \
   -e "s|#EXTENSION_CONFIG|${EXTENSION_CONFIG}|" \
+  -e "s|#UNAUTHORIZED_CONFIG|${UNAUTHORIZED_CONFIG}|" \
   conf/server-demo.conf \
   > /etc/nginx/conf.d/app-${RBAC_APP_ID}.conf
 

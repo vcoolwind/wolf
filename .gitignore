@@ -1,2 +1,4 @@
 server/.nyc_output
 server/coverage
+.idea
+server/html

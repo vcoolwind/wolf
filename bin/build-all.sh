@@ -2,7 +2,7 @@ if [ "$#" == "0" ]; then
   # echo "Usage: sh $0 TAG"
   # echo "\tTAG: 1.2.3"
   # exit 1
-  TAG=`cd wolf && git describe`
+  TAG=`git describe`
   echo "used tag of git: ${TAG}"
 else
   TAG="$1"

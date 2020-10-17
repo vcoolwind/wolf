@@ -3,6 +3,8 @@ local util = require("util")
 local json = require("json")
 local agent_pub = require("agent_pub")
 local config = require("config")
+local custom = require("custom")
+
 
 local login_url = "/wolf/rbac/login.html"
 local no_permission = "/wolf/rbac/no_permission"
@@ -163,8 +165,16 @@ local function access_check()
                 local redirect_url = no_permission
                 if url == '/' then
                     redirect_url = no_permission_html
+                    url_redirect(redirect_url, { username = username, reason=reason })
+		        else
+                    -- url_redirect(redirect_url, { username = username, reason=reason })
+		            -- return json direct or redirect
+		            if "true" == os.getenv("UNAUTHORIZED_DIRECT") then
+                        custom.unauthorized(ngx.var.uri,username,reason)
+		            else
+		                url_redirect(redirect_url, { username = username, reason=reason })
+		            end
                 end
-                url_redirect(redirect_url, { username = username, reason=reason })
             end
         elseif status == ngx.HTTP_BAD_REQUEST then
             ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
