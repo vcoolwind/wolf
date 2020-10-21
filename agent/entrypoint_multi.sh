@@ -9,6 +9,9 @@ single_config(){
   if [ ! -n "${BACKEND_UPSTREAM}" ]; then
     BACKEND_UPSTREAM="http://127.0.0.1:10084"
   fi
+  if [ ! -n "${RBAC_SERVER_URL}" ]; then
+    RBAC_SERVER_URL="http://127.0.0.1:10080"
+  fi
   if [ ! -n "${RBAC_APP_ID}" ]; then
     RBAC_APP_ID="unknown"
   fi
@@ -32,6 +35,9 @@ single_config(){
 
 multiple_config(){
   echo "multiple_config--------->"
+  if [ ! -n "${RBAC_SERVER_URL}" ]; then
+    RBAC_SERVER_URL="http://127.0.0.1:10080"
+  fi
   # generate multiple app conf
   #eg: {"AGENT_PORT":"10082","SERVER_NAME":"www.web1.com","BACKEND_UPSTREAM":"http://myapp1:8000","RBAC_APP_ID":"App-web1","UNAUTH_DIRECT":"true"}||{"AGENT_PORT":"10082","SERVER_NAME":"www.web2.com","BACKEND_UPSTREAM":"http://myapp2:8000","RBAC_APP_ID":"App-web2","UNAUTH_DIRECT":"false"}
   backends=(${MULTI_BACKEND//||/ })

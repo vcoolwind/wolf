@@ -169,7 +169,7 @@ local function access_check()
 		        else
                     -- url_redirect(redirect_url, { username = username, reason=reason })
 		            -- return json direct or redirect
-		            if "true" == os.getenv("UNAUTHORIZED_DIRECT") then
+		            if "true" == ngx.var.unAuthDirect or ngx.var.unAuthDirect  then
                         custom.unauthorized(ngx.var.uri,username,reason)
 		            else
 		                url_redirect(redirect_url, { username = username, reason=reason })
