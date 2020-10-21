@@ -118,8 +118,6 @@ local function access_check()
 	end
 
     local appID = ngx.var.appID or "appIDUnset"
-
-
     local clientIP = util.clientIP()
     local permItem = "{appID: " .. appID .. ", action: " .. action .. ", url: " .. url .. ", clientIP: " .. clientIP .. "}"
 	ngx.log(ngx.INFO, "Cookie: ", ngx.var.http_cookie, ", permItem=", permItem)
