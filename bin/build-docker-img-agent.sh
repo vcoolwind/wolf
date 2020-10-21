@@ -8,3 +8,5 @@ TAG="$1"
 echo "BUILD TAG: $TAG"
 docker build -t igeeky/wolf-agent:$TAG -f ./agent/Dockerfile ./agent
 docker build -t igeeky/wolf-agent:latest -f ./agent/Dockerfile ./agent
+
+#docker build -t yanfengking/wolf-agent:0.3.2-20201019 -f ./agent/Dockerfile ./agent
