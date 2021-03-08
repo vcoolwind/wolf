@@ -21,8 +21,9 @@ class User extends BasicService {
 
   async access(bizMethod) {
     const method = this.ctx.method
-    if (method !== 'GET' && this.ctx.userInfo && bizMethod !== 'checkExist') { // POST, PUT, DELETE
-      if (this.ctx.userInfo.manager !== constant.Manager.super) {
+    if (method !== 'GET' && this.ctx.userInfo && bizMethod !== 'checkExist' && bizMethod !== 'list') { // POST, PUT, DELETE
+      if (this.ctx.userInfo.manager !== constant.Manager.super &&
+          this.ctx.userInfo.manager !== constant.Manager.admin) {
         this.log4js.error('access [%s] failed! user:%s have no permission to do this operation', bizMethod, this.ctx.userInfo.username)
         throw new AccessDenyError('need super user to do this operation.')
       }
@@ -37,25 +38,32 @@ class User extends BasicService {
   }
 
   async userLogin(username, password) {
-    let userInfo = await UserModel.findOne({where: {username}})
-    if (!userInfo) { // user not exist
-      this.log4js.warn('user [%s] login failed! user not exist', username)
-      return {err: errors.ERR_USER_NOT_FOUND}
-    }
+    try {
+      this.log4js.warn('connect database start .....')
+      let userInfo = await UserModel.findOne({where: {username}})
+      this.log4js.warn('connect database end .....')
+      if (!userInfo) { // user not exist
+        this.log4js.warn('user [%s] login failed! user not exist', username)
+        return {err: errors.ERR_USER_NOT_FOUND}
+      }
 
-    // compare the password.
-    this.log4js.info('password: %s', util.encodePassword(password))
-    if (!userInfo.password || !util.comparePassword(password, userInfo.password)) {
-      this.log4js.warn('user [%s] login failed! password error', username)
-      return {err: errors.ERR_PASSWORD_ERROR}
-    }
+      // compare the password.
+      this.log4js.info('password: %s', util.encodePassword(password))
+      if (!userInfo.password || !util.comparePassword(password, userInfo.password)) {
+        this.log4js.warn('user [%s] login failed! password error', username)
+        return {err: errors.ERR_PASSWORD_ERROR}
+      }
 
-    if (userInfo.status === constant.UserStatus.Disabled) {
-      this.log4js.warn('user [%s] login failed! disabled', username)
-      return {err: errors.ERR_USER_DISABLED}
+      if (userInfo.status === constant.UserStatus.Disabled) {
+        this.log4js.warn('user [%s] login failed! disabled', username)
+        return {err: errors.ERR_USER_DISABLED}
+      }
+      userInfo = userInfo.toJSON()
+      return { userInfo };
+    } catch (ex) {
+      /* istanbul ignore next */
+      log4js.error('app global catch', ex)
     }
-    userInfo = userInfo.toJSON()
-    return { userInfo };
   }
 
   async userApplications(userInfo) {
@@ -91,6 +99,8 @@ class User extends BasicService {
 
     this.log4js.info('### user[%s] login ...', username)
     const {userInfo, err: loginErr} = await this.userLogin(username, password)
+    this.log4js.info('### user[%s] end ...', username)
+
 
     if (loginErr) {
       this.fail(200, loginErr)

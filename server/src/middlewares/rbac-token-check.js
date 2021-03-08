@@ -73,6 +73,7 @@ module.exports = function() {
       ctx.userInfo = userInfo
       ctx.appid = appid
       ctx.token = token
+      ctx.userId=userInfo.id
 
       try {
         setResponseInfo(ctx, userInfo);

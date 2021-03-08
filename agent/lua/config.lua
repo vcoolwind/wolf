@@ -14,7 +14,7 @@ format：
 ]]
 _M.ignore_list = {
 	equals={"/favicon.ico"},
-	suffix={".js", ".css", ".ico"},
+	suffix={".js", ".css", ".ico", ".png", ".jpg", ".otf", ".css", ".js",".scss"},
 	prefix={}
 }
 

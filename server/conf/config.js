@@ -12,7 +12,7 @@ const config = {
     allowEmptyState: false,
     allowExtendedTokenAttributes: true,
     grants: ['authorization_code', 'refresh_token', 'client_credentials', 'password', 'implicit'],
-    accessTokenLifetime: parseInt(process.env.OAUTH_ACCESS_TOKEN_LIFETIME) || 3600 * 24 * 7, // 7 days
+    accessTokenLifetime: parseInt(process.env.OAUTH_ACCESS_TOKEN_LIFETIME) || 3600 * 1, // 7 days
     refreshTokenLifetime: parseInt(process.env.OAUTH_REFRESH_TOKEN_LIFETIME) || 3600 * 24 * 30, // 30 days.
   },
 }

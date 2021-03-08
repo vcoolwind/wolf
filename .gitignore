@@ -1,4 +1,9 @@
 server/.nyc_output
 server/coverage
 .idea
-server/html
+server/html/
+*.iml
+/node_modules
+server/node_modules
+server/log
+/server/package-lock.json

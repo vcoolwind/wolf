@@ -8,10 +8,16 @@ local change_pwd_url = "/wolf/rbac/change_pwd.html"
 local def_topbar_style = [[
 <style type="text/css">
 <!--
+.rbac-topbar-wrap {
+	position: fixed;
+    height: 30px;
+    width: 100%;
+	z-index: 999;
+	top: 0;
+}
 .rbac-topbar {
-	top: 0px;
 	height:30px;
-	background-color: #E6E8E7;
+	background-color: #fff;
 	font-size: 12px;
 	color: black;
 	background-position: top;
@@ -49,12 +55,14 @@ local def_topbar_style = [[
 
 
 local topbar_tpl = [[
-<div id="rbac-topbar" class="rbac-topbar">
-	<div id="rbac-sysname" class="rbac-sysname">%s</div>
-	<div id="rbac-info" class="rbac-info"> 
-	    <div id="rbac-username" class="rbac-username">USER: %s(%s)</div>
-	    <div id="rbac-password" class="rbac-password"><a %s>Change Password</a></div>
-	    <div id="rbac-logout" class="rbac-logout"><a href="%s" target="_self">Logout</a></div>
+<div class="rbac-topbar-wrap">
+	<div id="rbac-topbar" class="rbac-topbar">
+		<div id="rbac-sysname" class="rbac-sysname"></div>
+		<div id="rbac-info" class="rbac-info"> 
+			<div id="rbac-username" class="rbac-username">用户: %s</div>
+            <div id="rbac-password" class="rbac-password"><a %s>修改密码</a></div>
+            <div id="rbac-logout" class="rbac-logout"><a href="%s" target="_self">登出</a></div>
+        </div>
 	</div>
 </div>
 ]]
@@ -79,7 +87,7 @@ local function get_infobar()
 		href = string.format([[href="#" onclick="javascript:alert('Password change is not allowed');"]])
 	end
 	ngx.log(ngx.INFO, "user [", username, "](", nickname, ") request...")
-	local replace = get_style() .. string.format(topbar_tpl, config.sysname or 'WOLF-RBAC', username, nickname, href, logout_url)
+	local replace = get_style() .. string.format(topbar_tpl, nickname, href, logout_url)
 	return true, replace
 end
 

@@ -11,19 +11,33 @@ const userCache = require('../util/user-cache')
 const userFields = ['id', 'username', 'nickname', 'email', 'appIDs',
   'manager',  'lastLogin', 'profile', 'createTime', 'permissions', 'roles'];
 
+// const errors = {
+//   ERR_USERNAME_MISSING: 'Username missing!',
+//   ERR_PASSWORD_MISSING: 'Password missing!',
+//   ERR_USER_NOT_FOUND: 'User not found!',
+//   ERR_PASSWORD_ERROR: 'Password error!',
+//   ERR_APPID_MISSING: 'Appid missing!',
+//   ERR_PASSWORD_CHANGE_NOT_ALLOWED: 'Password change is not allowed',
+//   ERR_OLD_PASSWORD_REQUIRED: 'Old password is required',
+//   ERR_NEW_PASSWORD_REQUIRED: 'New password is required',
+//   ERR_REPEATED_PASSWORD_INCORRECT: 'The password you entered repeatedly is incorrect.',
+//   ERR_OLD_PASSWORD_INCORRECT: 'Old password is incorrect.',
+//   ERR_USER_DISABLED: 'User is disabled.'
+// }
 const errors = {
-  ERR_USERNAME_MISSING: 'Username missing!',
-  ERR_PASSWORD_MISSING: 'Password missing!',
-  ERR_USER_NOT_FOUND: 'User not found!',
-  ERR_PASSWORD_ERROR: 'Password error!',
-  ERR_APPID_MISSING: 'Appid missing!',
-  ERR_PASSWORD_CHANGE_NOT_ALLOWED: 'Password change is not allowed',
-  ERR_OLD_PASSWORD_REQUIRED: 'Old password is required',
-  ERR_NEW_PASSWORD_REQUIRED: 'New password is required',
-  ERR_REPEATED_PASSWORD_INCORRECT: 'The password you entered repeatedly is incorrect.',
-  ERR_OLD_PASSWORD_INCORRECT: 'Old password is incorrect.',
-  ERR_USER_DISABLED: 'User is disabled.'
+  ERR_USERNAME_MISSING: '请输入用户名',
+  ERR_PASSWORD_MISSING: '请输入密码',
+  ERR_USER_NOT_FOUND: '该用户名不存在',
+  ERR_PASSWORD_ERROR: '密码错误',
+  ERR_APPID_MISSING: '缺少appid',
+  ERR_PASSWORD_CHANGE_NOT_ALLOWED: '不允许修改密码',
+  ERR_OLD_PASSWORD_REQUIRED: '请输入旧密码',
+  ERR_NEW_PASSWORD_REQUIRED: '请输入新密码',
+  ERR_REPEATED_PASSWORD_INCORRECT: '输入的重复密码不正确',
+  ERR_OLD_PASSWORD_INCORRECT: '旧密码不正确',
+  ERR_USER_DISABLED: '该用户不可用'
 }
+
 
 class Rbac extends RbacPub {
   constructor(ctx) {
@@ -47,7 +61,6 @@ class Rbac extends RbacPub {
     } else {
       error = `appid missing`
     }
-
     await this.ctx.render('login', {
       returnTo,
       username,
@@ -151,17 +164,46 @@ class Rbac extends RbacPub {
         overwrite: false,
       }
     )
+    this.ctx.cookies.set('X-UserId', res.userInfo.id,
+        {
+          maxAge: maxAge,
+          httpOnly: false,
+          overwrite: false,
+        }
+    )
+    this.ctx.cookies.set('X-Username',res.userInfo.username,
+        {
+          maxAge: maxAge,
+          httpOnly: false,
+          overwrite: false,
+        }
+    )
+    // this.log4js.warn('userInfo is', res.userInfo)
+    // this.ctx.cookies.set('X-nickname',res.userInfo.nickname,
+    //     {
+    //       maxAge: maxAge,
+    //       httpOnly: false,
+    //       overwrite: false,
+    //     }
+    // )
     this.ctx.status = 302;
     this.ctx.redirect(returnTo);
   }
 
   async accessCheck() {
     //got from the token or args.
-    const appID = this.ctx.appid || this.getRequiredStringArg('appID');
+
+    this.log4js.info('this.ctx.appid is ===========>', this.ctx.appid)
+    this.log4js.info('this.getRequiredStringArg.appid is ===========>', this.getRequiredStringArg('appID'))
+    const appID = this.getRequiredStringArg('appID') || this.ctx.appid;
     const action = this.getRequiredStringArg('action')
     const resName = this.getRequiredStringArg('resName')
+    const  userId=this.ctx.userId;
+    this.log4js.info('this.ctx.userId is ===========>', userId)
 
-    const userInfo = this.ctx.userInfo
+    const {userInfo, cached} = await userCache.getUserInfoById(userId, appID)
+
+    this.log4js.info('this.ctx.userInfo is ===========>', userInfo)
     try {
       await this._accessCheckInternal(userInfo, appID, action, resName)
     } finally {
@@ -205,7 +247,16 @@ class Rbac extends RbacPub {
     const {username} = this.ctx.userInfo;
     const error = this.getArg('error', '')
     const success = null;
-    const args = {username, error, success, oldPassword: undefined, newPassword: undefined, reNewPassword: undefined}
+    const args = {
+      username, 
+      error, 
+      success, 
+      oldPassword: undefined, 
+      newPassword: undefined, 
+      reNewPassword: undefined,
+      // title: 'Change Password',
+      title: '修改密码',
+    }
     await this.ctx.render('change_pwd.html', args)
   }
 
@@ -283,8 +334,12 @@ class Rbac extends RbacPub {
       return
     }
 
-    args.success = 'change password successfully'
+    args.success = '修改密码成功'
     args.error = null;
+    let loginUrl = this.ctx.cookies.get('loginUrl')
+    this.ctx.cookies.set('x-rbac-token', '')
+    this.ctx.cookies.set('X-Username', '')
+    args.loginUrl = decodeURIComponent(loginUrl)
     await this.ctx.render('change_pwd.html', args)
   }
 

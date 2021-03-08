@@ -1,12 +1,28 @@
-if [ "$#" == "0" ]; then
-  echo "Usage: sh $0 TAG"
-  echo "\tTAG: 1.2.3"
-  exit 1
-fi
+#!/bin/bash
 
 TAG="$1"
-echo "BUILD TAG: $TAG"
-docker build -t igeeky/wolf-agent:$TAG -f ./agent/Dockerfile ./agent
-docker build -t igeeky/wolf-agent:latest -f ./agent/Dockerfile ./agent
+HUB="$2"
+if [ ! -n "${TAG}" ]; then
+  echo "use default TAG"
+  TAG=`git describe`"-"`date +%Y%m%d%H`
+fi
+if [ ! -n "${HUB}" ]; then
+  echo "use default HUB"
+  HUB="wolf"
+fi
 
-#docker build -t yanfengking/wolf-agent:0.3.2-20201019 -f ./agent/Dockerfile ./agent
+echo "BUILD TAG: ${TAG} HUB:${HUB}"
+
+###------------------------------###
+origin_path=`pwd`
+project_path=$(cd `dirname $0`; pwd)
+cd ${project_path}/../
+
+target_img=yourdockerhub.com/${HUB}/wolf-agent
+docker build -t ${target_img}:${TAG} -f ./agent/Dockerfile ./agent
+
+## uncomment The following two lines when you need auto push
+# docker login --username=xxxxxx yourdockerhub.com -p xxxxxx
+# docker push ${target_img}:${TAG}
+
+cd ${origin_path}

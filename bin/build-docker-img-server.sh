@@ -1,19 +1,28 @@
-if [ "$#" == "0" ]; then
-  echo "Usage: sh $0 TAG"
-  echo "\tTAG: 1.2.3"
-  exit 1
-fi
+#!/bin/bash
 
 TAG="$1"
-echo "BUILD TAG: $TAG"
-echo "BUILD CONSOLE..."
-cd ./console && npm install && npm run build:prod
-if [ "$?" != "0" ]; then
-  echo "build console failed!"
-  exit 2
+HUB="$2"
+if [ ! -n "${TAG}" ]; then
+  echo "use default TAG"
+  TAG=`git describe`"-"`date +%Y%m%d%H`
 fi
-cd ../
-echo "BUILD SERVER..."
-docker build -t igeeky/wolf-server:$TAG -f ./server/Dockerfile ./server
-docker build -t igeeky/wolf-server:latest -f ./server/Dockerfile ./server
-echo "BUILD SUCCESS."
+if [ ! -n "${HUB}" ]; then
+  echo "use default HUB"
+  HUB="wolf"
+fi
+
+echo "BUILD TAG: ${TAG} HUB:${HUB}"
+
+###------------------------------###
+origin_path=`pwd`
+project_path=$(cd `dirname $0`; pwd)
+cd ${project_path}/../
+
+target_img=yourdockerhub.com/${HUB}/wolf-server
+docker build -t ${target_img}:${TAG} .
+
+## uncomment The following two lines when you need auto push
+# docker login --username=xxxxxx yourdockerhub.com -p xxxxxx
+# docker push ${target_img}:${TAG}
+
+cd ${origin_path}

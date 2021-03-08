@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "bcrypt-node": "^0.1.0",
+    "cnpm": "^6.1.1",
     "ejs": "^2.6.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.6.2",

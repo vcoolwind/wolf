@@ -2,6 +2,7 @@
 local _M = {}
 
 local login_url = "/wolf/rbac/login.html"
+local login_url_img = "/wolf/rbac/img/login_bg.png"
 local login_post_url = "/wolf/rbac/login.submit"
 local logout_url = "/wolf/rbac/logout"
 local no_permission = "/wolf/rbac/no_permission"
@@ -11,7 +12,9 @@ local change_pwd_url = "/wolf/rbac/change_pwd.html"
 local change_pwd_post_url = "/wolf/rbac/change_pwd.submit"
 
 
-local ignore_list = {login_url, login_post_url,logout_url,no_permission,no_permission_html,access_check_url, change_pwd_url, change_pwd_post_url}
+local ignore_list = {login_url, login_post_url,logout_url,
+no_permission,no_permission_html,access_check_url, change_pwd_url,
+ change_pwd_post_url,login_url_img}
 
 function _M.is_ignore_url(url)
     if ignore_list == nil then
@@ -54,10 +57,12 @@ local function need_replace_internal()
 end
 
 function _M.need_replace()
-    if ngx.ctx.need_replace == nil then 
-        ngx.ctx.need_replace = need_replace_internal()
-    end
-    return ngx.ctx.need_replace
+    -- if ngx.ctx.need_replace == nil then
+    --     ngx.ctx.need_replace = need_replace_internal()
+    -- end
+    -- return ngx.ctx.need_replace
+    -- 默认忽略网页头部的退出登录按钮，把该动作交给应用端
+    return false
 end
 
 return _M
