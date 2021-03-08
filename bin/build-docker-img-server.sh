@@ -16,7 +16,7 @@ echo "BUILD TAG: ${TAG} HUB:${HUB}"
 ###------------------------------###
 origin_path=`pwd`
 project_path=$(cd `dirname $0`; pwd)
-cd ${project_path}/../
+cd ${project_path}/../server
 
 target_img=yourdockerhub.com/${HUB}/wolf-server
 docker build -t ${target_img}:${TAG} .

@@ -1,7 +1,6 @@
 # 先编译console，生成静态文件，为防止包太大，静态文件生成放入server包中
 FROM node:12.10.0-alpine as builder
 
-ARG env=prod
 RUN set -ex && \
     sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     npm config set registry https://registry.npm.taobao.org && \
@@ -9,6 +8,8 @@ RUN set -ex && \
     apk --no-cache add --virtual native-deps &&\
     apk --no-cache add g++ gcc libgcc libstdc++ linux-headers make python postgresql-dev  busybox-extras && \
     npm install --quiet node-gyp -g
+
+ARG env=prod
 
 WORKDIR /build/
 COPY . /build/
